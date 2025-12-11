@@ -47,13 +47,6 @@ export const NiceListBlock: Block = {
           relationTo: 'media',
         },
       ],
-      admin: {
-        components: {
-          RowLabel: ({ data, index }) => {
-            return data?.title || `Item ${index + 1}`
-          },
-        },
-      },
     },
   ],
 }

@@ -15,7 +15,7 @@ export const VideoBlock: Block = {
         description: 'YouTube or Vimeo URL',
         placeholder: 'https://www.youtube.com/watch?v=...',
       },
-      validate: (value) => {
+      validate: (value: string) => {
         const youtubeRegex = /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\/.+$/
         const vimeoRegex = /^(https?:\/\/)?(www\.)?vimeo\.com\/.+$/
         if (!youtubeRegex.test(value) && !vimeoRegex.test(value)) {

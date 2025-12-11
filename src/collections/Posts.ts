@@ -13,7 +13,6 @@ export const Posts: CollectionConfig = {
   slug: 'posts',
   admin: {
     useAsTitle: 'title',
-    defaultSort: '-createdAt',
   },
   versions: {
     drafts: true,
