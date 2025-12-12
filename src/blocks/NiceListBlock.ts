@@ -1,4 +1,5 @@
 import type { Block } from 'payload'
+import { lexicalEditor } from '@payloadcms/richtext-lexical'
 
 export const NiceListBlock: Block = {
   slug: 'niceList',
@@ -40,6 +41,7 @@ export const NiceListBlock: Block = {
         {
           name: 'description',
           type: 'richText',
+          editor: lexicalEditor(),
         },
         {
           name: 'icon',

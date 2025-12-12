@@ -1,4 +1,5 @@
 import type { Block } from 'payload'
+import { lexicalEditor } from '@payloadcms/richtext-lexical'
 
 export const InterviewBlock: Block = {
   slug: 'interview',
@@ -10,6 +11,7 @@ export const InterviewBlock: Block = {
     {
       name: 'introduction',
       type: 'richText',
+      editor: lexicalEditor(),
     },
     {
       name: 'qaItems',
@@ -37,6 +39,7 @@ export const InterviewBlock: Block = {
           name: 'answer',
           type: 'richText',
           required: true,
+          editor: lexicalEditor(),
         },
         {
           name: 'answerer',
