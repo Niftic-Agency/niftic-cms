@@ -129,6 +129,7 @@ export interface User {
    * Full name of the user
    */
   name?: string | null;
+  slug: string;
   /**
    * Main photo of the user
    */
@@ -483,6 +484,7 @@ export interface PayloadMigration {
  */
 export interface UsersSelect<T extends boolean = true> {
   name?: T;
+  slug?: T;
   photo?: T;
   photoAvatar?: T;
   bio?: T;
