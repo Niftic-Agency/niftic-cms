@@ -4,14 +4,13 @@ import { lexicalEditor } from '@payloadcms/richtext-lexical'
 export const Users: CollectionConfig = {
   slug: 'users',
   admin: {
-    useAsTitle: 'name',
+    useAsTitle: 'email',
   },
   auth: true,
   fields: [
     {
       name: 'name',
       type: 'text',
-      required: true,
       admin: {
         description: 'Full name of the user',
       },
