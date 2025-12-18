@@ -125,6 +125,50 @@ export interface UserAuthOperations {
  */
 export interface User {
   id: number;
+  /**
+   * Full name of the user
+   */
+  name?: string | null;
+  /**
+   * Main photo of the user
+   */
+  photo?: (number | null) | Media;
+  /**
+   * Avatar/small photo of the user
+   */
+  photoAvatar?: (number | null) | Media;
+  /**
+   * Biography or description of the user
+   */
+  bio?: string | null;
+  /**
+   * Whether this user profile should be publicly visible
+   */
+  public?: boolean | null;
+  /**
+   * Questions and answers for this user
+   */
+  qa?:
+    | {
+        question?: string | null;
+        answer?: {
+          root: {
+            type: string;
+            children: {
+              type: any;
+              version: number;
+              [k: string]: unknown;
+            }[];
+            direction: ('ltr' | 'rtl') | null;
+            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+            indent: number;
+            version: number;
+          };
+          [k: string]: unknown;
+        } | null;
+        id?: string | null;
+      }[]
+    | null;
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -195,6 +239,10 @@ export interface Post {
    */
   previewDescription: string;
   featured?: boolean | null;
+  /**
+   * Featured image for this post
+   */
+  featuredImage?: (number | null) | Media;
   publishedStatus: 'draft' | 'published';
   publishedAt?: string | null;
   content: (
@@ -434,6 +482,18 @@ export interface PayloadMigration {
  * via the `definition` "users_select".
  */
 export interface UsersSelect<T extends boolean = true> {
+  name?: T;
+  photo?: T;
+  photoAvatar?: T;
+  bio?: T;
+  public?: T;
+  qa?:
+    | T
+    | {
+        question?: T;
+        answer?: T;
+        id?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
   email?: T;
@@ -491,6 +551,7 @@ export interface PostsSelect<T extends boolean = true> {
   category?: T;
   previewDescription?: T;
   featured?: T;
+  featuredImage?: T;
   publishedStatus?: T;
   publishedAt?: T;
   content?:
