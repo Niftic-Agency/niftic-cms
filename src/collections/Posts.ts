@@ -89,6 +89,15 @@ export const Posts: CollectionConfig = {
       },
     },
     {
+      name: 'featuredImage',
+      type: 'upload',
+      relationTo: 'media',
+      admin: {
+        position: 'sidebar',
+        description: 'Featured image for this post',
+      },
+    },
+    {
       name: 'publishedStatus',
       type: 'select',
       required: true,
