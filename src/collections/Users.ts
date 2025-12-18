@@ -57,12 +57,10 @@ export const Users: CollectionConfig = {
         {
           name: 'question',
           type: 'textarea',
-          required: true,
         },
         {
           name: 'answer',
           type: 'richText',
-          required: true,
           editor: lexicalEditor(),
         },
       ],
