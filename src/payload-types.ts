@@ -70,7 +70,9 @@ export interface Config {
     users: User;
     media: Media;
     categories: Category;
+    tags: Tag;
     posts: Post;
+    'case-studies': CaseStudy;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -81,7 +83,9 @@ export interface Config {
     users: UsersSelect<false> | UsersSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
+    tags: TagsSelect<false> | TagsSelect<true>;
     posts: PostsSelect<false> | PostsSelect<true>;
+    'case-studies': CaseStudiesSelect<false> | CaseStudiesSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -210,6 +214,22 @@ export interface Media {
  * via the `definition` "categories".
  */
 export interface Category {
+  id: number;
+  name: string;
+  slug: string;
+  description?: string | null;
+  /**
+   * Hex color code (e.g., #FF6B6B)
+   */
+  color?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "tags".
+ */
+export interface Tag {
   id: number;
   name: string;
   slug: string;
@@ -398,6 +418,173 @@ export interface Post {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "case-studies".
+ */
+export interface CaseStudy {
+  id: number;
+  client: string;
+  title: string;
+  tileType: 'image' | 'vimeo';
+  vimeoId?: string | null;
+  tileImage?: (number | null) | Media;
+  slug: string;
+  /**
+   * Select one or more categories
+   */
+  category: (number | Category)[];
+  /**
+   * Select one or more tags
+   */
+  tags: (number | Tag)[];
+  textContent: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  media: (
+    | {
+        type: 'image' | 'text' | 'vector' | 'quote' | 'video' | 'local video' | 'slideshow';
+        /**
+         * Column span on extra small screens
+         */
+        'Column Span XS': number;
+        /**
+         * Column span on large screens
+         */
+        'Column Span LG': number;
+        src?: (number | null) | Media;
+        /**
+         * Alt text for accessibility
+         */
+        alt?: string | null;
+        /**
+         * SVG file upload
+         */
+        SVGFile?: (number | null) | Media;
+        /**
+         * Background color (hex code)
+         */
+        backgroundColor?: string | null;
+        content?: string | null;
+        /**
+         * Call to action text
+         */
+        cta?: string | null;
+        layout?: 'default' | null;
+        author?: string | null;
+        alignment?: ('left' | 'center' | 'right') | null;
+        /**
+         * YouTube or Vimeo video ID
+         */
+        videoID?: string | null;
+        centerCrop?: boolean | null;
+        srcs?:
+          | {
+              image: number | Media;
+              id?: string | null;
+            }[]
+          | null;
+        /**
+         * Aspect ratio (e.g., 16/9, 4/3, 1/1)
+         */
+        aspectRatio?: string | null;
+        caption?: string | null;
+        /**
+         * Optional title for the caption
+         */
+        captionTitle?: string | null;
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'workMedia';
+      }
+    | {
+        /**
+         * Single image or multiple images. Use "images" for desktop-mobile pair or multiple.
+         */
+        type: 'image' | 'images';
+        /**
+         * Column span on extra small screens
+         */
+        'Column Span XS': number;
+        /**
+         * Column span on large screens
+         */
+        'Column Span LG': number;
+        /**
+         * 'desktop', 'desktop-mobile', 'mobile', or 'mobile-stacked'
+         */
+        screenType: 'desktop' | 'desktop-mobile' | 'mobile' | 'mobile-stacked';
+        /**
+         * Bolded caption title (optional)
+         */
+        captionTitle?: string | null;
+        /**
+         * Caption text below the mockup image (optional)
+         */
+        caption?: string | null;
+        /**
+         * Background color (CSS, e.g. #023257 or rgb(0,0,0))
+         */
+        backgroundColor?: string | null;
+        /**
+         * Background image shown inside the mockup (optional)
+         */
+        backgroundImage?: (number | null) | Media;
+        /**
+         * CSS aspect-ratio (e.g. 16/9, 1/1, 4/3, etc)
+         */
+        aspectRatio?: string | null;
+        /**
+         * Enable animation (scrolling content inside mockup)
+         */
+        scrolling?: boolean | null;
+        /**
+         * Main image (required if type is "image" and screenType is not multiple). Use for single image.
+         */
+        src?: (number | null) | Media;
+        /**
+         * Multiple images (required if type is "images" or screenType is "desktop-mobile", "mobile-stacked"). For desktop-mobile, provide 2 images (desktop, mobile). For mobile-stacked, provide 3 images (stacked).
+         */
+        srcs?:
+          | {
+              image: number | Media;
+              id?: string | null;
+            }[]
+          | null;
+        /**
+         * Alt text for the images
+         */
+        alt?: string | null;
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'workMockup';
+      }
+    | {
+        /**
+         * Column span on large screens
+         */
+        'Column Span LG': number;
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'workSpacer';
+      }
+  )[];
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -433,8 +620,16 @@ export interface PayloadLockedDocument {
         value: number | Category;
       } | null)
     | ({
+        relationTo: 'tags';
+        value: number | Tag;
+      } | null)
+    | ({
         relationTo: 'posts';
         value: number | Post;
+      } | null)
+    | ({
+        relationTo: 'case-studies';
+        value: number | CaseStudy;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -534,6 +729,18 @@ export interface MediaSelect<T extends boolean = true> {
  * via the `definition` "categories_select".
  */
 export interface CategoriesSelect<T extends boolean = true> {
+  name?: T;
+  slug?: T;
+  description?: T;
+  color?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "tags_select".
+ */
+export interface TagsSelect<T extends boolean = true> {
   name?: T;
   slug?: T;
   description?: T;
@@ -650,6 +857,88 @@ export interface PostsSelect<T extends boolean = true> {
                     icon?: T;
                     id?: T;
                   };
+              id?: T;
+              blockName?: T;
+            };
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "case-studies_select".
+ */
+export interface CaseStudiesSelect<T extends boolean = true> {
+  client?: T;
+  title?: T;
+  tileType?: T;
+  vimeoId?: T;
+  tileImage?: T;
+  slug?: T;
+  category?: T;
+  tags?: T;
+  textContent?: T;
+  media?:
+    | T
+    | {
+        workMedia?:
+          | T
+          | {
+              type?: T;
+              'Column Span XS'?: T;
+              'Column Span LG'?: T;
+              src?: T;
+              alt?: T;
+              SVGFile?: T;
+              backgroundColor?: T;
+              content?: T;
+              cta?: T;
+              layout?: T;
+              author?: T;
+              alignment?: T;
+              videoID?: T;
+              centerCrop?: T;
+              srcs?:
+                | T
+                | {
+                    image?: T;
+                    id?: T;
+                  };
+              aspectRatio?: T;
+              caption?: T;
+              captionTitle?: T;
+              id?: T;
+              blockName?: T;
+            };
+        workMockup?:
+          | T
+          | {
+              type?: T;
+              'Column Span XS'?: T;
+              'Column Span LG'?: T;
+              screenType?: T;
+              captionTitle?: T;
+              caption?: T;
+              backgroundColor?: T;
+              backgroundImage?: T;
+              aspectRatio?: T;
+              scrolling?: T;
+              src?: T;
+              srcs?:
+                | T
+                | {
+                    image?: T;
+                    id?: T;
+                  };
+              alt?: T;
+              id?: T;
+              blockName?: T;
+            };
+        workSpacer?:
+          | T
+          | {
+              'Column Span LG'?: T;
               id?: T;
               blockName?: T;
             };
