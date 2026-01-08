@@ -148,13 +148,5 @@ export const WorkMockupBlock: Block = {
           siblingData?.screenType === 'mobile-stacked',
       },
     },
-    {
-      name: 'alt',
-      type: 'text',
-      required: false,
-      admin: {
-        description: 'Alt text for the images',
-      },
-    },
   ],
 }

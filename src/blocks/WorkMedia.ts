@@ -65,15 +65,6 @@ export const WorkMediaBlock: Block = {
         condition: (data, siblingData) => siblingData?.type === 'image',
       },
     },
-    {
-      name: 'alt',
-      type: 'text',
-      admin: {
-        condition: (data, siblingData) =>
-          siblingData?.type === 'image' || siblingData?.type === 'slideshow',
-        description: 'Alt text for accessibility',
-      },
-    },
     // Vector/SVG fields
     {
       name: 'SVGFile',
@@ -101,14 +92,6 @@ export const WorkMediaBlock: Block = {
       admin: {
         condition: (data, siblingData) =>
           siblingData?.type === 'text' || siblingData?.type === 'quote',
-      },
-    },
-    {
-      name: 'cta',
-      type: 'text',
-      admin: {
-        condition: (data, siblingData) => siblingData?.type === 'text',
-        description: 'Call to action text',
       },
     },
     {
