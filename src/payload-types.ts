@@ -143,6 +143,10 @@ export interface User {
    */
   photoAvatar?: (number | null) | Media;
   /**
+   * Role/Title of the user
+   */
+  title?: ('design' | 'engineering' | 'logistics' | 'content' | 'marketing') | null;
+  /**
    * Biography or description of the user
    */
   bio?: string | null;
@@ -254,7 +258,7 @@ export interface Post {
    */
   authors: (number | User)[];
   studioTag: 'product-studio' | 'brand-studio';
-  category: number | Category;
+  category: (number | Category)[];
   /**
    * Short description for listings (max 300 chars)
    */
@@ -682,6 +686,7 @@ export interface UsersSelect<T extends boolean = true> {
   slug?: T;
   photo?: T;
   photoAvatar?: T;
+  title?: T;
   bio?: T;
   public?: T;
   qa?:
