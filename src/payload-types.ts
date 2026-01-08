@@ -258,7 +258,7 @@ export interface Post {
    */
   authors: (number | User)[];
   studioTag: 'product-studio' | 'brand-studio';
-  category: (number | Category)[];
+  category: number | Category;
   /**
    * Short description for listings (max 300 chars)
    */
