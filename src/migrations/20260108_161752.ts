@@ -2,6 +2,14 @@ import { MigrateUpArgs, MigrateDownArgs, sql } from '@payloadcms/db-d1-sqlite'
 
 export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   await db.run(sql`PRAGMA foreign_keys=OFF;`)
+  // Clean up any leftover temporary tables from previous failed migration attempts
+  await db.run(sql`DROP TABLE IF EXISTS \`__temp_posts_rels\`;`)
+  await db.run(sql`DROP TABLE IF EXISTS \`__new_posts\`;`)
+  await db.run(sql`DROP TABLE IF EXISTS \`__new__posts_v\`;`)
+  // Check if posts_rels exists and handle accordingly
+  const postsRelsExists = await db.get(sql`
+    SELECT name FROM sqlite_master WHERE type='table' AND name='posts_rels';
+  `)
   // Temporarily recreate posts_rels without foreign key to posts to allow dropping posts
   await db.run(sql`CREATE TABLE \`__temp_posts_rels\` (
   	\`id\` integer PRIMARY KEY NOT NULL,
@@ -12,8 +20,14 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	FOREIGN KEY (\`users_id\`) REFERENCES \`users\`(\`id\`) ON UPDATE no action ON DELETE cascade
   );
   `)
-  await db.run(sql`INSERT INTO \`__temp_posts_rels\`("id", "order", "parent_id", "path", "users_id") SELECT "id", "order", "parent_id", "path", "users_id" FROM \`posts_rels\`;`)
-  await db.run(sql`DROP TABLE \`posts_rels\`;`)
+  if (postsRelsExists) {
+    await db.run(sql`INSERT INTO \`__temp_posts_rels\`("id", "order", "parent_id", "path", "users_id") SELECT "id", "order", "parent_id", "path", "users_id" FROM \`posts_rels\`;`)
+    await db.run(sql`DROP TABLE \`posts_rels\`;`)
+  }
+  // Check if posts exists
+  const postsExists = await db.get(sql`
+    SELECT name FROM sqlite_master WHERE type='table' AND name='posts';
+  `)
   await db.run(sql`CREATE TABLE \`__new_posts\` (
   	\`id\` integer PRIMARY KEY NOT NULL,
   	\`title\` text,
@@ -30,22 +44,35 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	FOREIGN KEY (\`featured_image_id\`) REFERENCES \`media\`(\`id\`) ON UPDATE no action ON DELETE set null
   );
   `)
-  await db.run(sql`INSERT INTO \`__new_posts\`("id", "title", "slug", "studio_tag", "preview_description", "featured", "featured_image_id", "published_status", "published_at", "updated_at", "created_at", "_status") SELECT "id", "title", "slug", "studio_tag", "preview_description", "featured", "featured_image_id", "published_status", "published_at", "updated_at", "created_at", "_status" FROM \`posts\`;`)
-  await db.run(sql`DROP TABLE \`posts\`;`)
+  if (postsExists) {
+    await db.run(sql`INSERT INTO \`__new_posts\`("id", "title", "slug", "studio_tag", "preview_description", "featured", "featured_image_id", "published_status", "published_at", "updated_at", "created_at", "_status") SELECT "id", "title", "slug", "studio_tag", "preview_description", "featured", "featured_image_id", "published_status", "published_at", "updated_at", "created_at", "_status" FROM \`posts\`;`)
+    await db.run(sql`DROP TABLE \`posts\`;`)
+  }
   await db.run(sql`ALTER TABLE \`__new_posts\` RENAME TO \`posts\`;`)
   // Recreate posts_rels with foreign key to posts restored
-  await db.run(sql`CREATE TABLE \`posts_rels\` (
-  	\`id\` integer PRIMARY KEY NOT NULL,
-  	\`order\` integer,
-  	\`parent_id\` integer NOT NULL,
-  	\`path\` text NOT NULL,
-  	\`users_id\` integer,
-  	FOREIGN KEY (\`parent_id\`) REFERENCES \`posts\`(\`id\`) ON UPDATE no action ON DELETE cascade,
-  	FOREIGN KEY (\`users_id\`) REFERENCES \`users\`(\`id\`) ON UPDATE no action ON DELETE cascade
-  );
+  const postsRelsAlreadyExists = await db.get(sql`
+    SELECT name FROM sqlite_master WHERE type='table' AND name='posts_rels';
   `)
-  await db.run(sql`INSERT INTO \`posts_rels\`("id", "order", "parent_id", "path", "users_id") SELECT "id", "order", "parent_id", "path", "users_id" FROM \`__temp_posts_rels\`;`)
-  await db.run(sql`DROP TABLE \`__temp_posts_rels\`;`)
+  if (!postsRelsAlreadyExists) {
+    await db.run(sql`CREATE TABLE \`posts_rels\` (
+    	\`id\` integer PRIMARY KEY NOT NULL,
+    	\`order\` integer,
+    	\`parent_id\` integer NOT NULL,
+    	\`path\` text NOT NULL,
+    	\`users_id\` integer,
+    	FOREIGN KEY (\`parent_id\`) REFERENCES \`posts\`(\`id\`) ON UPDATE no action ON DELETE cascade,
+    	FOREIGN KEY (\`users_id\`) REFERENCES \`users\`(\`id\`) ON UPDATE no action ON DELETE cascade
+    );
+    `)
+  }
+  // Only insert data if __temp_posts_rels has data (check if it exists and has rows)
+  const tempPostsRelsExists = await db.get(sql`
+    SELECT name FROM sqlite_master WHERE type='table' AND name='__temp_posts_rels';
+  `)
+  if (tempPostsRelsExists) {
+    await db.run(sql`INSERT INTO \`posts_rels\`("id", "order", "parent_id", "path", "users_id") SELECT "id", "order", "parent_id", "path", "users_id" FROM \`__temp_posts_rels\`;`)
+    await db.run(sql`DROP TABLE \`__temp_posts_rels\`;`)
+  }
   await db.run(sql`CREATE INDEX \`posts_rels_order_idx\` ON \`posts_rels\` (\`order\`);`)
   await db.run(sql`CREATE INDEX \`posts_rels_parent_idx\` ON \`posts_rels\` (\`parent_id\`);`)
   await db.run(sql`CREATE INDEX \`posts_rels_path_idx\` ON \`posts_rels\` (\`path\`);`)
