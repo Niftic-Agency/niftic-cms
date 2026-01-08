@@ -2,6 +2,18 @@ import { MigrateUpArgs, MigrateDownArgs, sql } from '@payloadcms/db-d1-sqlite'
 
 export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   await db.run(sql`PRAGMA foreign_keys=OFF;`)
+  // Temporarily recreate posts_rels without foreign key to posts to allow dropping posts
+  await db.run(sql`CREATE TABLE \`__temp_posts_rels\` (
+  	\`id\` integer PRIMARY KEY NOT NULL,
+  	\`order\` integer,
+  	\`parent_id\` integer NOT NULL,
+  	\`path\` text NOT NULL,
+  	\`users_id\` integer,
+  	FOREIGN KEY (\`users_id\`) REFERENCES \`users\`(\`id\`) ON UPDATE no action ON DELETE cascade
+  );
+  `)
+  await db.run(sql`INSERT INTO \`__temp_posts_rels\`("id", "order", "parent_id", "path", "users_id") SELECT "id", "order", "parent_id", "path", "users_id" FROM \`posts_rels\`;`)
+  await db.run(sql`DROP TABLE \`posts_rels\`;`)
   await db.run(sql`CREATE TABLE \`__new_posts\` (
   	\`id\` integer PRIMARY KEY NOT NULL,
   	\`title\` text,
@@ -21,6 +33,23 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   await db.run(sql`INSERT INTO \`__new_posts\`("id", "title", "slug", "studio_tag", "preview_description", "featured", "featured_image_id", "published_status", "published_at", "updated_at", "created_at", "_status") SELECT "id", "title", "slug", "studio_tag", "preview_description", "featured", "featured_image_id", "published_status", "published_at", "updated_at", "created_at", "_status" FROM \`posts\`;`)
   await db.run(sql`DROP TABLE \`posts\`;`)
   await db.run(sql`ALTER TABLE \`__new_posts\` RENAME TO \`posts\`;`)
+  // Recreate posts_rels with foreign key to posts restored
+  await db.run(sql`CREATE TABLE \`posts_rels\` (
+  	\`id\` integer PRIMARY KEY NOT NULL,
+  	\`order\` integer,
+  	\`parent_id\` integer NOT NULL,
+  	\`path\` text NOT NULL,
+  	\`users_id\` integer,
+  	FOREIGN KEY (\`parent_id\`) REFERENCES \`posts\`(\`id\`) ON UPDATE no action ON DELETE cascade,
+  	FOREIGN KEY (\`users_id\`) REFERENCES \`users\`(\`id\`) ON UPDATE no action ON DELETE cascade
+  );
+  `)
+  await db.run(sql`INSERT INTO \`posts_rels\`("id", "order", "parent_id", "path", "users_id") SELECT "id", "order", "parent_id", "path", "users_id" FROM \`__temp_posts_rels\`;`)
+  await db.run(sql`DROP TABLE \`__temp_posts_rels\`;`)
+  await db.run(sql`CREATE INDEX \`posts_rels_order_idx\` ON \`posts_rels\` (\`order\`);`)
+  await db.run(sql`CREATE INDEX \`posts_rels_parent_idx\` ON \`posts_rels\` (\`parent_id\`);`)
+  await db.run(sql`CREATE INDEX \`posts_rels_path_idx\` ON \`posts_rels\` (\`path\`);`)
+  await db.run(sql`CREATE INDEX \`posts_rels_users_id_idx\` ON \`posts_rels\` (\`users_id\`);`)
   await db.run(sql`PRAGMA foreign_keys=ON;`)
   await db.run(sql`CREATE UNIQUE INDEX \`posts_slug_idx\` ON \`posts\` (\`slug\`);`)
   await db.run(sql`CREATE INDEX \`posts_featured_idx\` ON \`posts\` (\`featured\`);`)
