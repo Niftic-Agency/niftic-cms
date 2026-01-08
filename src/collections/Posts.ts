@@ -68,7 +68,6 @@ export const Posts: CollectionConfig = {
       name: 'category',
       type: 'relationship',
       relationTo: 'categories',
-      hasMany: true,
       required: true,
     },
     {
