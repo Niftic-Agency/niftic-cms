@@ -52,6 +52,20 @@ export const Users: CollectionConfig = {
       },
     },
     {
+      name: 'title',
+      type: 'select',
+      options: [
+        { label: 'Design', value: 'design' },
+        { label: 'Engineering', value: 'engineering' },
+        { label: 'Logistics', value: 'logistics' },
+        { label: 'Content', value: 'content' },
+        { label: 'Marketing', value: 'marketing' },
+      ],
+      admin: {
+        description: 'Role/Title of the user',
+      },
+    },
+    {
       name: 'bio',
       type: 'textarea',
       admin: {
