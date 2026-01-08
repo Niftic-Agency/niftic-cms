@@ -62,7 +62,7 @@ DELETE /api/categories/{id} (requires auth)
 - `slug` (text, required, unique, indexed): Auto-generated from title
 - `authors` (relationship, hasMany, required): One or more users as authors
 - `studioTag` (select, required): "product-studio" or "brand-studio"
-- `category` (relationship, required): Single category assignment
+- `category` (relationship, hasMany, required): One or more category assignments
 - `previewDescription` (textarea, required, max 300 chars): Preview text for listings
 - `featured` (checkbox, indexed): Feature this post on homepage
 - `publishedStatus` (select, required, indexed): "draft" or "published"
