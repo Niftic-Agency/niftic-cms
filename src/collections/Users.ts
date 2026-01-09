@@ -51,7 +51,7 @@ export const Users: CollectionConfig = {
         description: 'Avatar/small photo of the user',
       },
     },
-    /*{
+    {
       name: 'title',
       type: 'select',
       options: [
@@ -64,7 +64,7 @@ export const Users: CollectionConfig = {
       admin: {
         description: 'Role/Title of the user',
       },
-    },*/
+    },
     {
       name: 'bio',
       type: 'textarea',
