@@ -468,10 +468,6 @@ export interface CaseStudy {
         'Column Span LG': number;
         src?: (number | null) | Media;
         /**
-         * Alt text for accessibility
-         */
-        alt?: string | null;
-        /**
          * SVG file upload
          */
         SVGFile?: (number | null) | Media;
@@ -480,10 +476,6 @@ export interface CaseStudy {
          */
         backgroundColor?: string | null;
         content?: string | null;
-        /**
-         * Call to action text
-         */
-        cta?: string | null;
         layout?: 'default' | null;
         author?: string | null;
         alignment?: ('left' | 'center' | 'right') | null;
@@ -565,10 +557,6 @@ export interface CaseStudy {
               id?: string | null;
             }[]
           | null;
-        /**
-         * Alt text for the images
-         */
-        alt?: string | null;
         id?: string | null;
         blockName?: string | null;
         blockType: 'workMockup';
@@ -894,11 +882,9 @@ export interface CaseStudiesSelect<T extends boolean = true> {
               'Column Span XS'?: T;
               'Column Span LG'?: T;
               src?: T;
-              alt?: T;
               SVGFile?: T;
               backgroundColor?: T;
               content?: T;
-              cta?: T;
               layout?: T;
               author?: T;
               alignment?: T;
@@ -936,7 +922,6 @@ export interface CaseStudiesSelect<T extends boolean = true> {
                     image?: T;
                     id?: T;
                   };
-              alt?: T;
               id?: T;
               blockName?: T;
             };
